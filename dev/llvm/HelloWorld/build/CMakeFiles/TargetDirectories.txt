@@ -1,0 +1,3 @@
+/data/hanzt1/he/codes/engine/tests/llvm/HelloWorld/build/CMakeFiles/HelloWorld.dir
+/data/hanzt1/he/codes/engine/tests/llvm/HelloWorld/build/CMakeFiles/edit_cache.dir
+/data/hanzt1/he/codes/engine/tests/llvm/HelloWorld/build/CMakeFiles/rebuild_cache.dir

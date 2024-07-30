@@ -1,0 +1,3 @@
+/data/hanzt1/he/codes/engine/tests/llvm/OpcodeCounter/build/CMakeFiles/OpcodeCounter.dir
+/data/hanzt1/he/codes/engine/tests/llvm/OpcodeCounter/build/CMakeFiles/edit_cache.dir
+/data/hanzt1/he/codes/engine/tests/llvm/OpcodeCounter/build/CMakeFiles/rebuild_cache.dir

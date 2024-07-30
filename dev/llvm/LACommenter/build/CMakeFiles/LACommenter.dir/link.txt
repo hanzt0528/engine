@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -fno-rtti -shared -Wl,-soname,libLACommenter.so -o libLACommenter.so CMakeFiles/LACommenter.dir/LACommenter.cpp.o

@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -fno-rtti -shared -Wl,-soname,libHelloWorld.so -o libHelloWorld.so CMakeFiles/HelloWorld.dir/HelloWorld.cpp.o

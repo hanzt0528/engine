@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -fno-rtti -shared -Wl,-soname,libObfuscator.so -o libObfuscator.so CMakeFiles/Obfuscator.dir/Obfuscator.cpp.o

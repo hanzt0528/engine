@@ -1,0 +1,5 @@
+digraph "CFG for 'f' function" {
+	label="CFG for 'f' function";
+
+	Node0x5604491380d0 [shape=record,label="{%2:\l  %3 = icmp sgt i64 %0, %1\l  %4 = select i1 %3, i64 20, i64 %1\l  %5 = add i64 %4, %0\l  ret i64 %5\l}"];
+}
