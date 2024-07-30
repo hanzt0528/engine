@@ -1,0 +1,21 @@
+build
+.vscode
+.idea
+_release
+cmake-build-*/
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.a
+# Python's Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+core.*
