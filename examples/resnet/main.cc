@@ -697,84 +697,35 @@ static ggml_tensor * apply_conv2d(ggml_context * ctx, ggml_tensor * input, const
     return result;
 }
 
-
-static ggml_tensor * apply_bn2d2(ggml_context * ctx, ggml_tensor * input, const bn_layer & layer)
-{
-    struct ggml_tensor * sub_result = ggml_sub(ctx, input, ggml_batch_repeat(ctx, layer.mean, input));
-
-    return sub_result;
-
-    struct ggml_tensor *t = sub_result;
-    //printf("Layer sub_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-
-    struct ggml_tensor * sqrt_result = ggml_sqrt(ctx,layer.var);
-    t = sqrt_result;
-    //printf("Layer sqrt_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-    struct ggml_tensor * div_result = ggml_div(ctx,sub_result,ggml_repeat(ctx, sqrt_result, sub_result));
-    t = div_result;
-    //printf("Layer div_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-    struct ggml_tensor * result = ggml_mul_mat(ctx,div_result,ggml_repeat(ctx,layer.weight, div_result));
-
-    t = result;
-    //printf("Layer ggml_mul_mat output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-
-    result = ggml_add(ctx, result, ggml_repeat(ctx, layer.bias, result));
-
-    return result;
-    // struct ggml_tensor * result = ggml_conv_2d(ctx, layer.weight, input, layer.stride, layer.stride, layer.padding, layer.padding, 1, 1);
-    // if(layer.have_bias)
-    // {
-    //     result = ggml_add(ctx, result, ggml_repeat(ctx, layer.bias, result));
-    // }
-    
-    // result = ggml_relu(ctx, result);
-
-    // return result;
-}
-
 static ggml_tensor * apply_bn2d(ggml_context * ctx, ggml_tensor * input, const bn_layer & layer)
 {
     struct ggml_tensor * sub_result = ggml_sub(ctx, input, ggml_batch_repeat(ctx, layer.mean, input));
 
-
-    return input;
-    
+   
     struct ggml_tensor *t = sub_result;
     //printf("Layer sub_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
 
     struct ggml_tensor * sqrt_result = ggml_sqrt(ctx,layer.var);
     t = sqrt_result;
+
+
     //printf("Layer sqrt_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
     struct ggml_tensor * div_result = ggml_div(ctx,sub_result,ggml_batch_repeat(ctx, sqrt_result, sub_result));
     
-    
     t = div_result;
     //printf("Layer div_result output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-    struct ggml_tensor * result = ggml_mul_mat(ctx,div_result,ggml_batch_repeat(ctx,layer.weight, div_result));
+ 
+    struct ggml_tensor * result = ggml_mul(ctx,div_result,ggml_batch_repeat(ctx,layer.weight, div_result));
 
     t = result;
-    //printf("Layer ggml_mul_mat output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
+    //printf("Layer ggml_mul_mat output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
     result = ggml_add(ctx, result, ggml_batch_repeat(ctx, layer.bias, result));
 
     return result;
-    // struct ggml_tensor * result = ggml_conv_2d(ctx, layer.weight, input, layer.stride, layer.stride, layer.padding, layer.padding, 1, 1);
-    // if(layer.have_bias)
-    // {
-    //     result = ggml_add(ctx, result, ggml_repeat(ctx, layer.bias, result));
-    // }
-    
-    // result = ggml_relu(ctx, result);
-
-    // return result;
 }
 // evaluate the model
 //
@@ -821,88 +772,109 @@ int model_eval(
     ggml_set_name(input, "input");
 
 
-    struct ggml_tensor * result = apply_conv2d(ctx0, input, model.conv1);
+    struct ggml_tensor * result = apply_conv2d(ctx0, input, model.conv1,false);
     //print_shape(0, result);
 
 
-    //result = apply_bn2d(ctx0, result, model.bn1);
+    result = apply_bn2d(ctx0, result, model.bn1);
+
+
+    result = ggml_relu(ctx0, result);
     
-    struct ggml_tensor * result_log = input;
-
-    ggml_build_forward_expand(gf, result);
-    //ggml_build_forward_expand(gf, view);
-    ggml_graph_compute_with_ctx(ctx0, gf, n_threads);
-
-    {
-        struct ggml_tensor * log = result_log;
-        const float *data= ggml_get_data_f32(log);
-
-
-        std::cout << "sub data:"<<std::endl;
-        for(int i = 0; i < ggml_nelements(log); i++)
-        {
-            std::cout << data[i]<<std::endl;
-        }
-
-    }
-
-    return 1;
-
+  
+    
     //print_shape(0, result);
-    
-    result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_MAX, 3, 3, 2, 2, 1, 1);   
-    
+    result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_MAX, 3, 3, 2, 2, 1, 1); 
+
+    // struct ggml_tensor * result_log = result;
+
+    // ggml_build_forward_expand(gf, result);
+    // ggml_graph_compute_with_ctx(ctx0, gf, n_threads);
+
+    // {
+    //     struct ggml_tensor * log = result_log;
+    //     const float *data= ggml_get_data_f32(log);
+
+
+    //     std::cout << "result_log data:"<<std::endl;
+    //     for(int i = 0; i < ggml_nelements(log); i++)
+    //     {
+    //         std::cout << data[i]<<std::endl;
+    //     }
+
+    // }
+
+    // return 1;
+
+
     print_shape(0, result);
+    struct ggml_tensor * result_layer1; 
     for(int layer = 0; layer < 4; layer++)
     {
-        struct ggml_tensor * x = result;
+
         for(int block = 0; block < 2; block++)
         {
-            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv1);
+            struct ggml_tensor * x = result;
+            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv1,false);
+
+
             result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn1);
-            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv2);
+
+
+            result = ggml_relu(ctx0, result);
+
+            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv2,false);
+
             result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn2);
+
             struct ggml_tensor *t = result;
             printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
-
-
+            struct ggml_tensor *downsample_result;
             if(model.layers[layer].blocks[block].have_dowsample)
             {
-                struct ggml_tensor *downsample_result = apply_conv2d(ctx0, x, model.layers[layer].blocks[block].dowsample.conv,false);
+                downsample_result = apply_conv2d(ctx0, x, model.layers[layer].blocks[block].dowsample.conv,false);
                 downsample_result = apply_bn2d(ctx0, downsample_result, model.layers[layer].blocks[block].dowsample.bn);
-                ggml_tensor * add = ggml_add(ctx0,result,downsample_result);
-
-                result = ggml_relu(ctx0,add);
                 //printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
             }
+            else
+            {
+                downsample_result = x;
+            }
+            result  = ggml_add(ctx0,result,downsample_result);
+
+            result = ggml_relu(ctx0,result);
+
         }
+
+        // if(layer == 3)
+        // {
+        //     result_layer1 = result;
+        // }
     }
+
+    result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_AVG, 7, 7, 7,7, 0, 0);   
+
+
+    struct ggml_tensor * view = ggml_reshape_1d(ctx0,result, result->ne[0]*result->ne[1]*result->ne[2]*result->ne[3]);
+
+
+    result = ggml_add(ctx0, ggml_mul_mat(ctx0, model.fc.weight, view),                model.fc.bias);
+
+
+
+
+
+
     struct ggml_tensor *t = result;
     printf("Layer 4 layer output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
 
-    result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_AVG, 7, 7, 7,7, 0, 0);   
-    t = result;
-    printf("Layer avgpool output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-
-    struct ggml_tensor * view = ggml_reshape_1d(ctx0,result, result->ne[0]*result->ne[1]*result->ne[2]*result->ne[3]);
-    t = view;
-    printf("Layer view output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-
-
-    ggml_tensor * fc1 = ggml_add(ctx0, ggml_mul_mat(ctx0, model.fc.weight, view),                model.fc.bias);
-
-    t = fc1;
-    printf("Layer fc1 output shape:  %3d x %3d x %4d x %3d\n",  (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
 
 
 
     // // soft max
-    ggml_tensor * probs = ggml_soft_max(ctx0, fc1);
+    ggml_tensor * probs = ggml_soft_max(ctx0, result);
     
     ggml_set_name(probs, "probs");
 
@@ -914,18 +886,18 @@ int model_eval(
     // //ggml_graph_print   (&gf);
     // ggml_graph_dump_dot(gf, NULL, "alexnet.dot");
 
-    {
-        struct ggml_tensor * log = result_log;
-        const float *data= ggml_get_data_f32(log);
+    // {
+    //     struct ggml_tensor * log = result_log;
+    //     const float *data= ggml_get_data_f32(log);
 
 
-        std::cout << "result_log data:"<<std::endl;
-        for(int i = 0; i < ggml_nelements(log); i++)
-        {
-            std::cout << data[i]<<std::endl;
-        }
+    //     std::cout << "result_log data:"<<std::endl;
+    //     for(int i = 0; i < ggml_nelements(log); i++)
+    //     {
+    //         std::cout << data[i]<<std::endl;
+    //     }
 
-    }
+    // }
 
 
     const float * probs_data = ggml_get_data_f32(probs);

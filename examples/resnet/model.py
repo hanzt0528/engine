@@ -61,14 +61,38 @@ class BasicBlock(nn.Module):
             )
  
     def forward(self, x):
-        out = self.relu(self.bn1(self.conv1(x)))
+        out = self.conv1(x)
+        
+
+                
+        out = self.bn1(out)
+
+        out = self.relu(out)
+        
+
+          
         out = self.conv2(out)
 
 
         out = self.bn2(out)
-        print(f'bn2 out shape = {out.shape}')
+        
+
         out += self.downsample(x)
+        # dump_data = out
+
+        
+        # dump_data = dump_data.flatten()
+        # dump_data = dump_data.tolist()
+        
+         
+        # with open('/data/hanzt1/he/codes/engine/examples/resnet/output-out-layer1-block2-add.txt', 'w') as file:
+        #     # 遍历数组并将每个元素写入文件
+        #     for num in dump_data:
+        #         file.write(f"{num}\n")
+                
+        print(f'bn2 out shape = {out.shape}')
         out = self.relu(out)
+
         return out
  
 class ResNet(nn.Module):
@@ -105,33 +129,32 @@ class ResNet(nn.Module):
         print(f'bn1.mean = {self.bn1.running_mean}')
         mean = self.bn1.running_mean.view(1, self.bn1.num_features, 1, 1)
         
-        sub = x
-        print(f'out - mean = {sub}')
-        
-     
-        sub = sub.flatten()
-        sub = sub.tolist()
-        
-         
-        with open('output-x.txt', 'w') as file:
-            # 遍历数组并将每个元素写入文件
-            for num in sub:
-                file.write(f"{num}\n")
+
         
         var = self.bn1.running_var.view(1, self.bn1.num_features, 1, 1)
             
         x_normalized = (out - mean) / torch.sqrt(var + 0.000001)
         
+
         
         out = self.bn1.weight.view(1, self.bn1.num_features, 1, 1) * x_normalized + self.bn1.bias.view(1, self.bn1.num_features, 1, 1)
         
-        print(f'bn1 out = {out}')
+
         #out = self.bn1(out)
+        print(f"x_normalized shape = {x_normalized.shape}")
+        print(f"x_normalized  = {x_normalized}")
+        print(f"self.bn1.weight.view(1, self.bn1.num_features, 1, 1) = {self.bn1.weight.view(1, self.bn1.num_features, 1, 1)}")
         
+
+                
       
-        print(f'bn1 = {out}')
+        
         out = self.relu(out)
         out = self.maxpool(out)
+
+                
+                
+
         print(f"maxpool shape = {out.shape}")
         out = self.layer1(out)
         out = self.layer2(out)
@@ -139,10 +162,37 @@ class ResNet(nn.Module):
         out = self.layer4(out)
         print(f" 4 layer shape = {out.shape}")
         out = self.avgpool(out)
+        
+        dump_data = out
+
+        
+        dump_data = dump_data.flatten()
+        dump_data = dump_data.tolist()
+        
+         
+        with open('output-out-avgpool.txt', 'w') as file:
+            # 遍历数组并将每个元素写入文件
+            for num in dump_data:
+                file.write(f"{num}\n")
+                
         print(f" avgpool shape = {out.shape}")
         out = out.view(out.size(0), -1)
         print(f" viewed shape = {out.shape}")
         out = self.fc(out)
+        
+        dump_data = out
+
+        
+        dump_data = dump_data.flatten()
+        dump_data = dump_data.tolist()
+        
+         
+        with open('output-out-fc.txt', 'w') as file:
+            # 遍历数组并将每个元素写入文件
+            for num in dump_data:
+                file.write(f"{num}\n")
+                
+
         return out
  
 # 使用BasicBlock定义ResNet18

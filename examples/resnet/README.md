@@ -86,6 +86,11 @@ ResNet(
   (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
   (fc): Linear(in_features=512, out_features=1000, bias=True)
 )
+
+```
+### export resnet18 to state_dict
+```
+ python export_pytorch_model.py 
 ```
 
 ### Convert resnet to ggml

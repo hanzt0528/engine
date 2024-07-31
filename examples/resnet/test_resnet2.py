@@ -7,14 +7,14 @@ device = 'cpu'
 model = ResNet18()
 #model = model.to(device)
 # 加载预训练的state_dict
-state_dict = torch.load('resnet18.state_dict')
+state_dict = torch.load('/data/hanzt1/he/codes/engine/examples/resnet/resnet18.state_dict')
 #print(state_dict)
 # 更新模型参数
 model.load_state_dict(state_dict)
 model.eval()
 print(model)
 import urllib
-url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
+url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "/data/hanzt1/he/codes/engine/examples/resnet/dog.jpg")
 #try: urllib.URLopener().retrieve(url, filename)
 #except: urllib.request.urlretrieve(url, filename)
 
@@ -29,6 +29,15 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 input_tensor = preprocess(input_image)
+
+# input = input_tensor.flatten()
+# input = input.tolist()
+
+# with open('input.txt', 'w') as file:
+#     # 遍历数组并将每个元素写入文件
+#     for num in input:
+#         file.write(f"{num}\n")
+                
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
 #print(f'input_batch = {input_batch}')

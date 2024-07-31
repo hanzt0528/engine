@@ -19,3 +19,7 @@ __pycache__/
 *$py.class
 
 core.*
+*.txt
+# model
+*.bin
+*.state_dict

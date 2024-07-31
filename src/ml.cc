@@ -803,7 +803,8 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
                 n_tasks = 1;
             } break;
 
-  case GGML_OP_MUL_MAT:
+        case GGML_OP_MUL:
+        case GGML_OP_MUL_MAT:
             {
                 n_tasks = n_threads;
 
@@ -2652,6 +2653,49 @@ struct ggml_tensor * ggml_sqrt_inplace(
         struct ggml_tensor  * a) {
     return ggml_sqrt_impl(ctx, a, true);
 }
+
+
+// ggml_mul
+
+static struct ggml_tensor * ggml_mul_impl(
+        struct ggml_context * ctx,
+        struct ggml_tensor * a,
+        struct ggml_tensor * b,
+        bool inplace) {
+    // TODO: support less-strict constraint
+    //       GGML_ASSERT(ggml_can_repeat(b, a));
+    GGML_ASSERT(ggml_can_repeat_rows(b, a));
+
+    bool is_node = false;
+
+    if (!inplace && (a->grad || b->grad)) {
+        // TODO: support backward pass for broadcasting
+        GGML_ASSERT(ggml_are_same_shape(a, b));
+        is_node = true;
+    }
+
+    if (inplace) {
+        GGML_ASSERT(!is_node);
+    }
+
+    struct ggml_tensor * result = inplace ? ggml_view_tensor(ctx, a) : ggml_dup_tensor(ctx, a);
+
+    result->op   = GGML_OP_MUL;
+    result->grad = is_node ? ggml_dup_tensor(ctx, result) : NULL;
+    result->src[0] = a;
+    result->src[1] = b;
+
+    return result;
+}
+
+
+struct ggml_tensor * ggml_mul(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b) {
+    return ggml_mul_impl(ctx, a, b, false);
+}
+
 // ggml_mul_mat
 
 struct ggml_tensor * ggml_mul_mat(
