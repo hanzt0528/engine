@@ -1,6 +1,7 @@
 https://pytorch.org/hub/pytorch_vision_resnet/
 
-###ResNet18
+### ResNet18 网络结构
+网络定义，见model.py
 ```
 ResNet(
   (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
@@ -88,7 +89,7 @@ ResNet(
 )
 
 ```
-### export resnet18 to state_dict
+### export resnet18 of pytorch  to state_dict
 ```
  python export_pytorch_model.py 
 ```
@@ -410,11 +411,93 @@ out - mean = tensor([[[[ 4.3601e+00,  5.6735e+00,  5.8900e+00,  ...,  6.1452e+00
             1.7119e+00,  2.6841e+00]]]])
 ```
 
-### Run
+### Build & Run
 ```
-./bin/resnet ../examples/resnet/resnet-ggml-model-f32.bin ../examples/resnet/dog.bin
+$cd engine/build
+$ make
+$ ./bin/resnet ../examples/resnet/resnet-ggml-model-f32.bin ../examples/resnet/dog.bin
+```
+
+
+### BatchNorm
+
+此处，以模型的bn1为例说明。
+#### bn1定义
 
 ```
+self.bn1 = nn.BatchNorm2d(64)
+```
+
+构造参数64是指batch数量，对于图像就是输入特征图的通道数目.
+##### bn1的输入和输出
+bn1的输入和输出都是： 112 x 112 x   64 x   1，具体如下：
+```
+model.input  shape:  224 x 224 x    3 x   1
+model.conv1  shape:  112 x 112 x   64 x   1
+model.bn1  shape:  112 x 112 x   64 x   1
+model.relu  shape:  112 x 112 x   64 x   1
+model.maxpool  shape:   56 x  56 x   64 x   1
+```
+
+##### bn1的参数
+bn1有5个参数，推理时实际使用的是4个参数。
+```
+bn1.weight with shape: (64,)             //如果affine=True，这个参数表示可学习的缩放因子，形状与num_features相同
+bn1.bias with shape: (64,)               //如果affine=True，这个参数表示可学习的偏移量，形状与num_features相同。
+bn1.running_mean with shape: (64,)       // 运行均值，形状与num_features相同，用于跟踪输入数据的均值。
+bn1.running_var with shape: (64,)        // 运行方差，形状与num_features相同，用于跟踪输入数据的方差。
+bn1.num_batches_tracked with shape: ()   // 它是一个整数，用于跟踪层自初始化以来处理的批次数量。这个属性主要用于调试和分析模型，以确保批量归一化层能够正常地跟踪统计数据。num_batches_tracked通常只在调试或分析模型性能时使用，对于模型的训练和推理过程没有直接影响。
+```
+#### pytorch forward
+pytorch推理使用简单，pytorch内部已经自动处理，代码如下：
+```
+out = self.bn1(out)
+```
+
+#### ml 推理
+
+##### 1code：
+```
+static ggml_tensor * apply_bn2d(ggml_context * ctx, ggml_tensor * input, const bn_layer & layer)
+{
+    struct ggml_tensor * sub_result = ggml_sub(ctx, input, ggml_batch_repeat(ctx, layer.mean, input));
+
+    struct ggml_tensor * sqrt_result = ggml_sqrt(ctx,layer.var);
+
+    struct ggml_tensor * div_result = ggml_div(ctx,sub_result,ggml_batch_repeat(ctx, sqrt_result, sub_result));
+    
+    struct ggml_tensor * result = ggml_mul(ctx,div_result,ggml_batch_repeat(ctx,layer.weight, div_result));
+
+    result = ggml_add(ctx, result, ggml_batch_repeat(ctx, layer.bias, result));
+
+    return result;
+}
+```
+##### 2推理说明：
+对于bn1，执行函数apply_bn2d，
+
+输入input为112 x 112 x 64 x 1  
+layer.mean 为 64 x 1 x 1 x 1  
+进行减去均值操作具体执行:  
+input的第一个特征图（形状为112x112）内的所有数都减去同一个均值layer.mean[0]  
+依次类推，input的第64个特征图（形状为112x112）内的所有数都减去同一个均值layer.mean[63]  
+
+利用算子ggml_sub（对应数减法操作）前，需要对参数layer.mean进行数据形状修改
+对layer.mean 进行batch repeat 变为112 x 112 x   64 x   1。 
+batch repeat所做的工作为，将 64 x   1 x    1 x   1的第一个浮点数，变为112x112的形状。 
+比如layer.mean[0]=0.8,最后变为112x112：  
+
+0.8 0.8 0.8 ....  
+0.8 0.8 0.8 ....  
+....  
+0.8 0.8 0.8 ....  
+
+其他对应数的ggml_div，ggml_mul，ggml_add操作类似，都需要对参数进行batch repeat.
+
+
+
+
+
 
 
 
