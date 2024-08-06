@@ -199,6 +199,9 @@ class ResNet(nn.Module):
 def ResNet18():
     return ResNet(BasicBlock, [2,2,2,2],1000)
  
+ # 使用BasicBlock定义ResNet18
+def ResNet34():
+    return ResNet(BasicBlock, [3,4,6,3],1000)
 # 实例化模型
 model = ResNet18()
 print(model)

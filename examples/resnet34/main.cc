@@ -124,6 +124,18 @@ bool model_load(const std::string &fname,Model &model)
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.1.bn2.running_var
 
 
+        ctx_size += channels*64*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer1.2.bn2.running_var
+
         //layer2
         channels = 128;
         ctx_size += channels*64*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer2.0.conv1.weight
@@ -157,6 +169,35 @@ bool model_load(const std::string &fname,Model &model)
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.1.bn2.bias
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.1.bn2.running_mean
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.1.bn2.running_var
+
+
+
+
+        //2.2
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn1.running_var
+        
+        ctx_size += channels*128*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.2.bn2.running_var
+
+        //2.3
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn1.running_var
+        
+        ctx_size += channels*128*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer2.3.bn2.running_var
 
         //layer3
         channels = 256;
@@ -192,6 +233,61 @@ bool model_load(const std::string &fname,Model &model)
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.1.bn2.running_mean
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.1.bn2.running_var
 
+        //3.2
+
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.2.bn2.running_var
+
+
+        //3.3
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.3.bn2.running_var
+
+
+        //3.4
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.4.bn2.running_var
+
+
+        //3.5
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer3.5.bn2.running_var
 
 
         //layer4
@@ -229,6 +325,20 @@ bool model_load(const std::string &fname,Model &model)
         ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.1.bn2.running_var
 
 
+        //4.2
+
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.conv1.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn1.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn1.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn1.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn1.running_var
+        
+        ctx_size += channels*channels*3*3*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.conv2.weight
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn2.weight 
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn2.bias
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn2.running_mean
+        ctx_size += channels*ggml_type_sizef(GGML_TYPE_F32);//layer4.2.bn2.running_var
+
         ctx_size +=1000*512*ggml_type_sizef(GGML_TYPE_F32);//fc.weight
         ctx_size +=1000*ggml_type_sizef(GGML_TYPE_F32);//fc.bias
 
@@ -255,10 +365,12 @@ bool model_load(const std::string &fname,Model &model)
 
     for(int i = 0; i < layer_count; i++)
     {
-        model.layers[i].blocks.resize(2);
         model.layers[i].blocks[0].have_dowsample = i> 0 ?true:false;
     }
-    
+    model.layers[0].blocks.resize(3);
+    model.layers[1].blocks.resize(4);
+    model.layers[2].blocks.resize(6);
+    model.layers[2].blocks.resize(3);
     //read conv1
    {
         int32_t n_dims;

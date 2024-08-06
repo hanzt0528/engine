@@ -1,20 +1,20 @@
 import torch
 from model import ResNet18
-
+import time
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 device = 'cpu'
 # 创建AlexNet模型
 model = ResNet18()
 #model = model.to(device)
 # 加载预训练的state_dict
-state_dict = torch.load('/data/hanzt1/he/codes/engine/examples/resnet/resnet18.state_dict')
+state_dict = torch.load('resnet18.state_dict')
 #print(state_dict)
 # 更新模型参数
 model.load_state_dict(state_dict)
 model.eval()
 print(model)
 import urllib
-url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "/data/hanzt1/he/codes/engine/examples/resnet/dog.jpg")
+url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
 #try: urllib.URLopener().retrieve(url, filename)
 #except: urllib.request.urlretrieve(url, filename)
 
@@ -46,8 +46,13 @@ input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the
 #     input_batch = input_batch.to('cuda')
 #     model.to('cuda')
 
+start_time = time.time()
 with torch.no_grad():
     output = model(input_batch)
+    
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"执行时间：{execution_time} 秒")
 # Tensor of shape 1000, with confidence scores over ImageNet's 1000 classes
 #print(output[0])
 # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
