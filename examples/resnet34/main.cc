@@ -63,6 +63,34 @@ struct Model{
 
     struct ggml_context *ctx;
 };
+
+struct ModelConfig{
+    public:
+    std::vector<int> blocks;
+};
+
+ModelConfig config;
+
+void init_config_resnet18()
+{
+    config.blocks.resize(4);
+    config.blocks[0]=2;
+    config.blocks[1]=2;
+    config.blocks[2]=2;
+    config.blocks[3]=2;
+}
+
+
+void init_config_resnet34()
+{
+    config.blocks.resize(4);
+    config.blocks[0]=3;
+    config.blocks[1]=4;
+    config.blocks[2]=6;
+    config.blocks[3]=3;
+}
+
+
 void log_tensor(char * desc,struct ggml_tensor * t)
 {
     printf("%s  shape:  %3d x %3d x %4d x %3d\n", desc,(int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
@@ -359,18 +387,16 @@ bool model_load(const std::string &fname,Model &model)
         }
     }
 
-    int layer_count = 4;
+    int layer_count = config.blocks.size();
     model.layers.resize(layer_count);
 
 
     for(int i = 0; i < layer_count; i++)
     {
+        model.layers[i].blocks.resize(config.blocks[i]);
         model.layers[i].blocks[0].have_dowsample = i> 0 ?true:false;
     }
-    model.layers[0].blocks.resize(3);
-    model.layers[1].blocks.resize(4);
-    model.layers[2].blocks.resize(6);
-    model.layers[2].blocks.resize(3);
+
     //read conv1
    {
         int32_t n_dims;
@@ -389,7 +415,6 @@ bool model_load(const std::string &fname,Model &model)
 
         model.conv1.stride=2;
         model.conv1.padding=3;
-
    }
 
     //read bn1
@@ -464,7 +489,7 @@ bool model_load(const std::string &fname,Model &model)
     for(int i = 0; i < layer_count; i++)
     {
         std::cout << "*****read layer "<<i+1<<" ******"<<std::endl;
-        for(int b = 0; b < 2; b++)
+        for(int b = 0; b < config.blocks[i]; b++)
         {
             //conv1
             {
@@ -907,10 +932,10 @@ int model_eval(
     // return 1;
 
     struct ggml_tensor * result_layer1; 
-    for(int layer = 0; layer < 4; layer++)
+    for(int layer = 0; layer < config.blocks.size(); layer++)
     {
 
-        for(int block = 0; block < 2; block++)
+        for(int block = 0; block < config.blocks[layer]; block++)
         {
             struct ggml_tensor * x = result;
             result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv1);
@@ -1058,7 +1083,7 @@ int model_eval(
 int main(int argc,char* argv[])
 {
     std::cout << "lenet main:"<<std::endl;
-
+    init_config_resnet34();
     ggml_numa_init();
     srand(time(NULL));
     ggml_time_init();
@@ -1077,6 +1102,8 @@ int main(int argc,char* argv[])
             fprintf(stderr, "%s: failed to load model from '%s'\n", __func__, "models/ggml-model-f32.bin");
         return 1;
     }
+
+
 
           // read a random digit from the test set
     {

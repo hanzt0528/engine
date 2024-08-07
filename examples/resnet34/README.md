@@ -393,7 +393,7 @@ parameters = 21814732
 ```
 $cd engine/build
 $ make
-$ ./bin/resnet34 ../examples/resnet/resnet-ggml-model-f32.bin ../examples/resnet/dog.bin
+$ ./bin/resnet34 ../examples/resnet/resnet-ggml-model-f32.bin ../examples/resnet34/dog.bin
 ```
 
 
