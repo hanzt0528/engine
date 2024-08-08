@@ -20,6 +20,7 @@ __pycache__/
 
 core.*
 *.txt
+!CMakeLists.txt
 # model
 *.bin
 *.state_dict
