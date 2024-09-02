@@ -1,17 +1,11 @@
 import torch
-from model import ResNet34
-import time
+from torchvision.models import resnet50, ResNet50_Weights
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-device = 'cpu'
-# 创建AlexNet模型
-model = ResNet34()
-#model = model.to(device)
-# 加载预训练的state_dict
-state_dict = torch.load('/data/hanzt1/he/codes/engine/examples/resnet34/resnet34.state_dict')
-#print(state_dict)
-# 更新模型参数
-model.load_state_dict(state_dict)
+
+# Initialize model
+weights = ResNet50_Weights.IMAGENET1K_V2
+model = resnet50(weights=weights)
+
 model.eval()
 print(model)
 import urllib
@@ -30,33 +24,20 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 input_tensor = preprocess(input_image)
-
-# input = input_tensor.flatten()
-# input = input.tolist()
-
-# with open('input.txt', 'w') as file:
-#     # 遍历数组并将每个元素写入文件
-#     for num in input:
-#         file.write(f"{num}\n")
-                
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
-#print(f'input_batch = {input_batch}')
 # move the input and model to GPU for speed if available
-# if torch.cuda.is_available():
-#     input_batch = input_batch.to('cuda')
-#     model.to('cuda')
-start_time = time.time()
+if torch.cuda.is_available():
+    input_batch = input_batch.to('cuda')
+    model.to('cuda')
+
 with torch.no_grad():
     output = model(input_batch)
-    
-end_time = time.time()
-execution_time = end_time - start_time
-print(f"执行时间：{execution_time} 秒")
-
 # Tensor of shape 1000, with confidence scores over ImageNet's 1000 classes
-#print(output[0])
+print(output[0])
 # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
+
+print(f"output shape={output.shape}")
 probabilities = torch.nn.functional.softmax(output[0], dim=0)
 #print(probabilities)
 # Read the categories
