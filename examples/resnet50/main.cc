@@ -57,7 +57,7 @@ struct fc_layer {
     struct ggml_tensor * bias;
 };
 
-//ResNet18
+//ResNet50
 struct Model{
     struct conv2d_layer conv1;
     struct bn_layer bn1;
@@ -353,16 +353,29 @@ bool model_load(const std::string &fname,Model &model)
 
                 std::cout << "conv1 data size = " << ggml_nbytes(model.layers[i].blocks[b].conv1.weight)<<std::endl;
                 fin.read(reinterpret_cast<char*>(model.layers[i].blocks[b].conv1.weight->data),ggml_nbytes(model.layers[i].blocks[b].conv1.weight));
+                // if(b == 0 && i>0)
+                // {
+                //     model.layers[i].blocks[b].conv1.stride = 2;
+                //     model.layers[i].blocks[b].conv1.padding = 1;
+                // }
+                // else
+                // {
+                //     model.layers[i].blocks[b].conv1.stride = 1;
+                //     model.layers[i].blocks[b].conv1.padding = 1;
+                // }
                 if(b == 0 && i>0)
                 {
                     model.layers[i].blocks[b].conv1.stride = 2;
-                    model.layers[i].blocks[b].conv1.padding = 1;
+                    model.layers[i].blocks[b].conv1.padding = 0;
                 }
                 else
                 {
                     model.layers[i].blocks[b].conv1.stride = 1;
-                    model.layers[i].blocks[b].conv1.padding = 1;
+                    model.layers[i].blocks[b].conv1.padding = 0;
                 }
+
+                // model.layers[i].blocks[b].conv1.stride = 1;
+                // model.layers[i].blocks[b].conv1.padding = 0;
                 
             }
 
@@ -451,8 +464,21 @@ bool model_load(const std::string &fname,Model &model)
 
                 //std::cout << "conv1 data size = " << ggml_nbytes(model.conv2d_layers[i].weight)<<std::endl;
                 fin.read(reinterpret_cast<char*>(model.layers[i].blocks[b].conv2.weight->data),ggml_nbytes(model.layers[i].blocks[b].conv2.weight));
+                
+                // if(i > 0 && b==0 )
+                // {
+                //     model.layers[i].blocks[b].conv2.stride = 1;
+                //     model.layers[i].blocks[b].conv2.padding = 1;
+                // }
+                // else
+                // {
+                //     model.layers[i].blocks[b].conv2.stride = 1;
+                //     model.layers[i].blocks[b].conv2.padding = 1;
+                // }
+
                 model.layers[i].blocks[b].conv2.stride = 1;
                 model.layers[i].blocks[b].conv2.padding = 1;
+
             }
 
             //bn2
@@ -544,7 +570,7 @@ bool model_load(const std::string &fname,Model &model)
                 //std::cout << "conv1 data size = " << ggml_nbytes(model.conv2d_layers[i].weight)<<std::endl;
                 fin.read(reinterpret_cast<char*>(model.layers[i].blocks[b].conv3.weight->data),ggml_nbytes(model.layers[i].blocks[b].conv3.weight));
                 model.layers[i].blocks[b].conv3.stride = 1;
-                model.layers[i].blocks[b].conv3.padding = 1;
+                model.layers[i].blocks[b].conv3.padding = 0;
             }
 
             //bn3
@@ -639,7 +665,11 @@ bool model_load(const std::string &fname,Model &model)
 
                     //std::cout << "conv1 data size = " << ggml_nbytes(model.layers[i].blocks[b].conv1.weight)<<std::endl;
                     fin.read(reinterpret_cast<char*>(model.layers[i].blocks[b].dowsample.conv.weight ->data),ggml_nbytes(model.layers[i].blocks[b].dowsample.conv.weight));
-                    model.layers[i].blocks[b].dowsample.conv.stride = 2;
+                    if(i == 0)
+                        model.layers[i].blocks[b].dowsample.conv.stride = 1;
+                    else
+                        model.layers[i].blocks[b].dowsample.conv.stride = 2;
+
                     model.layers[i].blocks[b].dowsample.conv.padding = 0;
                 }
 
@@ -837,6 +867,7 @@ int model_eval(
     log_tensor("model.conv1",result);
 
 
+
     result = apply_bn2d(ctx0, result, model.bn1);
     log_tensor("model.bn1.mean",model.bn1.mean);
     log_tensor("model.bn1",result);
@@ -851,8 +882,72 @@ int model_eval(
     //print_shape(0, result);
     result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_MAX, 3, 3, 2, 2, 1, 1); 
     log_tensor("model.maxpool",result);
-    // struct ggml_tensor * result_log = result;
+    
 
+    struct ggml_tensor * result_log = nullptr;    
+    struct ggml_tensor * result_layer1; 
+    for(int layer = 0; layer < config.blocks.size(); layer++)
+    {
+        // if(layer ==3)
+        //     break;
+
+        for(int block = 0; block < config.blocks[layer]; block++)
+        {
+            struct ggml_tensor * x = result;
+
+            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv1);
+
+
+            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn1);
+
+            result = ggml_relu(ctx0, result);
+
+            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv2);
+
+            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn2);
+
+            result = ggml_relu(ctx0, result);
+
+            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv3);
+
+            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn3);
+
+
+            // if(layer ==1 && block ==0)
+            // {
+            //     result_log = result;
+            //     break;
+            // }
+            struct ggml_tensor *t = result;
+            printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
+
+            struct ggml_tensor *downsample_result;
+            if(model.layers[layer].blocks[block].have_dowsample)
+            {
+                downsample_result = apply_conv2d(ctx0, x, model.layers[layer].blocks[block].dowsample.conv);
+                downsample_result = apply_bn2d(ctx0, downsample_result, model.layers[layer].blocks[block].dowsample.bn);
+                //printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
+            }
+            else
+            {
+                downsample_result = x;
+            }
+
+            result  = ggml_add(ctx0,result,downsample_result);
+
+            result = ggml_relu(ctx0,result);
+        }
+
+        // if(layer == 3)
+        // {
+        //     result_layer1 = result;
+        // }
+
+    }
+
+        
+
+    // result_log = result;
     // ggml_build_forward_expand(gf, result);
     // ggml_graph_compute_with_ctx(ctx0, gf, n_threads);
 
@@ -869,56 +964,8 @@ int model_eval(
 
     // }
 
-    // return 1;
-
-    struct ggml_tensor * result_layer1; 
-    for(int layer = 0; layer < config.blocks.size(); layer++)
-    {
-
-        for(int block = 0; block < config.blocks[layer]; block++)
-        {
-            struct ggml_tensor * x = result;
-            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv1);
 
 
-            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn1);
-
-
-            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv2);
-
-            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn2);
-
-            result = apply_conv2d(ctx0, result, model.layers[layer].blocks[block].conv3);
-
-            result = apply_bn2d(ctx0, result, model.layers[layer].blocks[block].bn3);
-
-            result = ggml_relu(ctx0, result);
-
-            struct ggml_tensor *t = result;
-            printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-
-            struct ggml_tensor *downsample_result;
-            if(model.layers[layer].blocks[block].have_dowsample)
-            {
-                downsample_result = apply_conv2d(ctx0, x, model.layers[layer].blocks[block].dowsample.conv);
-                downsample_result = apply_bn2d(ctx0, downsample_result, model.layers[layer].blocks[block].dowsample.bn);
-                //printf("Layer %d block %d bn2 output shape:  %3d x %3d x %4d x %3d\n", layer,block, (int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
-            }
-            else
-            {
-                downsample_result = x;
-            }
-            result  = ggml_add(ctx0,result,downsample_result);
-
-            result = ggml_relu(ctx0,result);
-
-        }
-
-        // if(layer == 3)
-        // {
-        //     result_layer1 = result;
-        // }
-    }
 
     result = ggml_pool_2d(ctx0, result, GGML_OP_POOL_AVG, 7, 7, 7,7, 0, 0);   
 

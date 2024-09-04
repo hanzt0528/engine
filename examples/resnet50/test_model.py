@@ -14,7 +14,7 @@ state_dict = torch.load('/data/hanzt1/he/codes/engine/examples/resnet50/resnet50
 # 更新模型参数
 model.load_state_dict(state_dict)
 
-model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
+#odel = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
 
 
 model.eval()

@@ -25,11 +25,17 @@ class BasicBlock(nn.Module):
         #     self.downsample = nn.Sequential()
         # else:
         self.downsample = downsample
+        self.index = 0
 
     def forward(self, x):
         identity = x
 
         out = self.conv1(x)
+        print(f'out shape = {out.shape}')
+
+
+              
+                
         out = self.bn1(out)
         out = self.relu(out)
         
@@ -40,10 +46,23 @@ class BasicBlock(nn.Module):
         out = self.conv3(out)
         out = self.bn3(out)
  
-    
+        # dump_data = out
+
+        
+        # dump_data = dump_data.flatten()
+        # dump_data = dump_data.tolist()
+        
+         
+        # with open('/data/hanzt1/he/codes/engine/examples/resnet50/output-model-layer2-block0-bn3.txt', 'w') as file:
+        #     # 遍历数组并将每个元素写入文件
+        #     for num in dump_data:
+        #         file.write(f"{num}\n")
+ 
         if self.downsample is not None:
             identity = self.downsample(x)
         
+
+                
         out+=identity
         out = self.relu(out)
         return out
@@ -83,16 +102,40 @@ class ResNet(nn.Module):
 
     def forward(self, x):
         out = self.conv1(x)
+        
+
+        
         out = self.bn1(out)
         out = self.relu(out)
         out = self.maxpool(out)
         
-        print(f'maxpool out.shape = {out.shape}')
+
+
 
         out = self.layer1(out)
+        
+
+
+                
         out = self.layer2(out)
+        
         out = self.layer3(out)
         out = self.layer4(out)
+
+        # dump_data = out
+
+        
+        # dump_data = dump_data.flatten()
+        # dump_data = dump_data.tolist()
+        
+         
+        # with open('/data/hanzt1/he/codes/engine/examples/resnet50/output-model-layer4.txt', 'w') as file:
+        #     # 遍历数组并将每个元素写入文件
+        #     for num in dump_data:
+        #         file.write(f"{num}\n")
+        # return out
+      
+
 
         out = self.avgpool(out)
         out = torch.flatten(out, 1)
