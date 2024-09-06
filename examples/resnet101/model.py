@@ -149,4 +149,6 @@ def ResNet50():
     return ResNet(BasicBlock,[3,4,6,3],1000)
 
 
-print(ResNet50())
+def ResNet101():
+    return ResNet(BasicBlock,[3,4,23,3],1000)
+

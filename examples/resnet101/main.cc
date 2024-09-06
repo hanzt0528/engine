@@ -134,6 +134,39 @@ void init_config_resnet50()
     }
 }
 
+void init_config_resnet101()
+{
+    config.blocks.resize(4);
+    config.blocks[0]=3;
+    config.blocks[1]=4;
+    config.blocks[2]=23;
+    config.blocks[3]=3;
+
+    config.layers.resize(4);
+
+    int bn_size = 64;
+    for(int layer = 0; layer< 4;layer++)
+    {
+        config.layers[layer].bottle_configs.resize(3);
+        
+        if(layer == 0)
+        {
+            bn_size = 64;
+        }
+        else
+        {
+            bn_size = bn_size*2;
+        }
+        config.layers[layer].bottle_configs[0].kerner_size=1;
+        config.layers[layer].bottle_configs[0].bn_size = bn_size;
+        config.layers[layer].bottle_configs[1].kerner_size=3;
+        config.layers[layer].bottle_configs[1].bn_size = bn_size;
+        config.layers[layer].bottle_configs[2].kerner_size=1;
+        config.layers[layer].bottle_configs[2].bn_size = bn_size*4;
+    }
+}
+
+
 void log_tensor(char * desc,struct ggml_tensor * t)
 {
     printf("%s  shape:  %3d x %3d x %4d x %3d\n", desc,(int)t->ne[0], (int)t->ne[1], (int)t->ne[2], (int)t->ne[3]);
@@ -1068,6 +1101,7 @@ int main(int argc,char* argv[])
 {
     std::cout << "resnet50 main:"<<std::endl;
     init_config_resnet50();
+    init_config_resnet101();
     ggml_numa_init();
     srand(time(NULL));
     ggml_time_init();
