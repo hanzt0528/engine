@@ -8,6 +8,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(GGML_STANDALONE ON)
 
 option(GGML_BUILD_TESTS "ml: build tests" ${GGML_STANDALONE})
+option(GGML_CUBLAS                  "ggml: use cuBLAS"                   ON)
 
 if(GGML_BUILD_TESTS)
     message(STATUS "ON")

@@ -1508,7 +1508,7 @@ top[1]=0.170437 index = 259 label = Pomeranian
 top[3]=0.0151729 index = 261 label = keeshond
 top[2]=0.0211853 index = 270 label = white wolf
 main: predicted digit is 258
-
+duration = 30534
 ```
 
 

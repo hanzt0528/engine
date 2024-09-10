@@ -394,6 +394,45 @@ parameters = 21814732
 $cd engine/build
 $ make
 $ ./bin/resnet34 ../examples/resnet/resnet-ggml-model-f32.bin ../examples/resnet34/dog.bin
+
+model.input  shape:  224 x 224 x    3 x   1
+model.conv1  shape:  112 x 112 x   64 x   1
+model.bn1.mean  shape:   64 x   1 x    1 x   1
+model.bn1  shape:  112 x 112 x   64 x   1
+model.relu  shape:  112 x 112 x   64 x   1
+model.maxpool  shape:   56 x  56 x   64 x   1
+Layer 0 block 0 bn2 output shape:   56 x  56 x   64 x   1
+Layer 0 block 1 bn2 output shape:   56 x  56 x   64 x   1
+Layer 0 block 2 bn2 output shape:   56 x  56 x   64 x   1
+Layer 1 block 0 bn2 output shape:   28 x  28 x  128 x   1
+Layer 1 block 1 bn2 output shape:   28 x  28 x  128 x   1
+Layer 1 block 2 bn2 output shape:   28 x  28 x  128 x   1
+Layer 1 block 3 bn2 output shape:   28 x  28 x  128 x   1
+Layer 2 block 0 bn2 output shape:   14 x  14 x  256 x   1
+Layer 2 block 1 bn2 output shape:   14 x  14 x  256 x   1
+Layer 2 block 2 bn2 output shape:   14 x  14 x  256 x   1
+Layer 2 block 3 bn2 output shape:   14 x  14 x  256 x   1
+Layer 2 block 4 bn2 output shape:   14 x  14 x  256 x   1
+Layer 2 block 5 bn2 output shape:   14 x  14 x  256 x   1
+Layer 3 block 0 bn2 output shape:    7 x   7 x  512 x   1
+Layer 3 block 1 bn2 output shape:    7 x   7 x  512 x   1
+Layer 3 block 2 bn2 output shape:    7 x   7 x  512 x   1
+model.avgpool  shape:    1 x   1 x  512 x   1
+model.fc  shape:  1000 x   1 x    1 x   1
+model.softmax  shape:  1000 x   1 x    1 x   1
+top[0]=0.884524
+top[1]=0.0392486
+top[2]=0.0253334
+top[3]=0.0234304
+top[4]=0.00469687
+top[0]=0.884524 index = 258 label = Samoyed
+top[1]=0.0392486 index = 259 label = Pomeranian
+top[3]=0.0234304 index = 261 label = keeshond
+top[4]=0.00469687 index = 270 label = white wolf
+top[2]=0.0253334 index = 279 label = Arctic fox
+main: predicted digit is 258
+duration = 9393
+
 ```
 
 

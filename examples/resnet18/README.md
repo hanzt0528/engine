@@ -454,6 +454,7 @@ top[3]=0.00562407 index = 259 label = Pomeranian
 top[2]=0.0441554 index = 270 label = white wolf
 top[1]=0.0456407 index = 279 label = Arctic fox
 main: predicted digit is 258
+duration = 4887
 
 ```
 

@@ -10,7 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-
+#include <chrono>
 
 struct conv2d_layer {
     struct ggml_tensor * weight;
@@ -1127,10 +1127,15 @@ int main(int argc,char* argv[])
             std::cout <<digit[i]<<std::endl;
         }
     }
-  
+    auto c11_start = std::chrono::steady_clock::now();
+
     const int prediction = model_eval(model, 1, digit, "alexnet.ggml");
+    auto c11_end = std::chrono::steady_clock::now();
+    auto c11_duration = std::chrono::duration_cast<std::chrono::milliseconds>(c11_end-c11_start);
 
     fprintf(stdout, "%s: predicted digit is %d\n", __func__, prediction);
+
+    std::cout<<"duration = "<<static_cast<float>(c11_duration.count())<<std::endl;
 
     // ggml_free(model.ctx);
     return 1;

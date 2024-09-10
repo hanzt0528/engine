@@ -544,18 +544,18 @@ Layer 3 block 2 bn2 output shape:    7 x   7 x 2048 x   1
 model.avgpool  shape:    1 x   1 x 2048 x   1
 model.fc  shape:  1000 x   1 x    1 x   1
 model.softmax  shape:  1000 x   1 x    1 x   1
-top[0]=0.445456
-top[1]=0.0929845
-top[2]=0.0655242
-top[3]=0.062316
-top[4]=0.0621528
-top[3]=0.062316 index = 104 label = wallaby
-top[0]=0.445456 index = 258 label = Samoyed
-top[4]=0.0621528 index = 259 label = Pomeranian
-top[1]=0.0929845 index = 261 label = keeshond
-top[2]=0.0655242 index = 270 label = white wolf
+top[0]=0.876233
+top[1]=0.0292274
+top[2]=0.0188387
+top[3]=0.0109034
+top[4]=0.00943271
+top[4]=0.00943271 index = 248 label = Eskimo dog
+top[0]=0.876233 index = 258 label = Samoyed
+top[1]=0.0292274 index = 259 label = Pomeranian
+top[3]=0.0109034 index = 261 label = keeshond
+top[2]=0.0188387 index = 270 label = white wolf
 main: predicted digit is 258
-
+duration = 11359
 ```
 
 

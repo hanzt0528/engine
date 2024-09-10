@@ -268,6 +268,9 @@ inline static void * ggml_aligned_malloc(size_t size) {
 #endif
 #endif
 
+#ifdef GGML_USE_CUBLAS
+#include "ml-cuda.h"
+#endif
 
 // used to copy the number of elements and stride in bytes of tensors into local variables.
 // main purpose is to reduce code duplication and improve readability.

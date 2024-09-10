@@ -9,3 +9,10 @@ target_link_libraries(${TARGET-2} PRIVATE ml)
 
 
 install(TARGETS  ${TARGET-2} RUNTIME)
+
+set(TARGET-3 test-cuda)
+add_executable(${TARGET-3} test-cuda.cc )
+target_link_libraries(${TARGET-3} PRIVATE ml)
+
+
+install(TARGETS  ${TARGET-3} RUNTIME)

@@ -42,14 +42,19 @@ start_time = time.time()
 with torch.no_grad():
     output = model(input_batch)
     
-end_time = time.time()
-execution_time = end_time - start_time
-print(f"执行时间：{execution_time} 秒")
+
 
 # Tensor of shape 1000, with confidence scores over ImageNet's 1000 classes
 print(output[0])
 # The output has unnormalized scores. To get probabilities, you can run a softmax on it.
 probabilities = torch.nn.functional.softmax(output[0], dim=0)
+
+time.sleep(2)
+end_time = time.time()
+execution_time = end_time - start_time
+
+
+
 print('probabilities:')
 
 print(probabilities)
@@ -60,3 +65,5 @@ with open("imagenet_classes.txt", "r") as f:
 top5_prob, top5_catid = torch.topk(probabilities, 5)
 for i in range(top5_prob.size(0)):
     print(categories[top5_catid[i]], top5_prob[i].item())
+    
+print(f"执行时间：{execution_time} 秒")

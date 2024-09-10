@@ -997,23 +997,41 @@ Layer 2 block 2 bn2 output shape:   14 x  14 x 1024 x   1
 Layer 2 block 3 bn2 output shape:   14 x  14 x 1024 x   1
 Layer 2 block 4 bn2 output shape:   14 x  14 x 1024 x   1
 Layer 2 block 5 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 6 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 7 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 8 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 9 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 10 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 11 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 12 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 13 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 14 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 15 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 16 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 17 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 18 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 19 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 20 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 21 bn2 output shape:   14 x  14 x 1024 x   1
+Layer 2 block 22 bn2 output shape:   14 x  14 x 1024 x   1
 Layer 3 block 0 bn2 output shape:    7 x   7 x 2048 x   1
 Layer 3 block 1 bn2 output shape:    7 x   7 x 2048 x   1
 Layer 3 block 2 bn2 output shape:    7 x   7 x 2048 x   1
 model.avgpool  shape:    1 x   1 x 2048 x   1
 model.fc  shape:  1000 x   1 x    1 x   1
 model.softmax  shape:  1000 x   1 x    1 x   1
-top[0]=0.445456
-top[1]=0.0929845
-top[2]=0.0655242
-top[3]=0.062316
-top[4]=0.0621528
-top[3]=0.062316 index = 104 label = wallaby
-top[0]=0.445456 index = 258 label = Samoyed
-top[4]=0.0621528 index = 259 label = Pomeranian
-top[1]=0.0929845 index = 261 label = keeshond
-top[2]=0.0655242 index = 270 label = white wolf
+top[0]=0.746685
+top[1]=0.0254531
+top[2]=0.0168852
+top[3]=0.0106529
+top[4]=0.00628352
+top[4]=0.00628352 index = 248 label = Eskimo dog
+top[0]=0.746685 index = 258 label = Samoyed
+top[2]=0.0168852 index = 259 label = Pomeranian
+top[3]=0.0106529 index = 261 label = keeshond
+top[1]=0.0254531 index = 270 label = white wolf
 main: predicted digit is 258
+duration = 20828
 
 ```
 
