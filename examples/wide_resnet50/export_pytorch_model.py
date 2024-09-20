@@ -1,0 +1,15 @@
+import torch
+# sample execution (requires torchvision)
+from PIL import Image
+from torchvision import transforms
+model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
+# or any of these variants
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet34', pretrained=True)
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet101', pretrained=True)
+# model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet152', pretrained=True)
+
+
+print(model)
+torch.save(model.state_dict(),"resnet50.state_dict")
+print("save model to vgg.state_dict Done.")

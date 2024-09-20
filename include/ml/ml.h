@@ -810,4 +810,8 @@ void init_types();
             struct ggml_tensor  * a,
             struct ggml_tensor  * b);
             
+    GGML_API bool    ggml_is_quantized(enum ggml_type type);
+    GGML_API size_t  ggml_nbytes_split(const struct ggml_tensor * tensor, int nrows_split);
+
+
 #endif//ML_H_

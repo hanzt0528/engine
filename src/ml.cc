@@ -3963,6 +3963,15 @@ static void ggml_compute_forward(struct ggml_compute_params *params, struct ggml
         return;
     }
 
+#ifdef GGML_USE_CUBLAS
+    bool skip_cpu = ggml_cuda_compute_forward(params, tensor);
+    if (skip_cpu) {
+        return;
+    }
+    GGML_ASSERT(tensor->src[0] == NULL || tensor->src[0]->backend == GGML_BACKEND_CPU);
+    GGML_ASSERT(tensor->src[1] == NULL || tensor->src[1]->backend == GGML_BACKEND_CPU);
+#endif // GGML_USE_CUBLAS
+
     switch (tensor->op)
     {
     case GGML_OP_ADD:
@@ -5396,4 +5405,8 @@ struct ggml_tensor * ggml_batch_norm(struct ggml_context * ctx,struct ggml_tenso
 
 }
 
+size_t ggml_nbytes_split(const struct ggml_tensor * tensor, int nrows_split) {
+    static_assert(GGML_MAX_DIMS == 4, "GGML_MAX_DIMS is not 4 - update this function");
 
+    return (nrows_split*tensor->ne[0]*ggml_type_size(tensor->type))/ggml_blck_size(tensor->type);
+}
