@@ -20,6 +20,10 @@ make
 
 ```
 
+## cuda log
+```
+/opt/nvidia/nsight-systems/2022.4.1/bin/nsys profile ./bin/op_add
+```
 
 
 ## 切换为clang编译方法
