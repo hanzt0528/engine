@@ -7,7 +7,7 @@ if (GGML_ALL_WARNINGS)
           -Wno-unused-function
           -Wno-multichar
       )
-      add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:${cxx_flags}>")
+     #add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:${cxx_flags}>")
   endif()
 endif()
 

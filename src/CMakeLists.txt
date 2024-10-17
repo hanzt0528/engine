@@ -11,7 +11,7 @@ if (GGML_CUBLAS)
 
     if (CUDAToolkit_FOUND)
         message(STATUS "cuBLAS found")
-
+        set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
         enable_language(CUDA)
 
         set(GGML_CUDA_SOURCES ml-cuda.cu ml-cuda.h)
